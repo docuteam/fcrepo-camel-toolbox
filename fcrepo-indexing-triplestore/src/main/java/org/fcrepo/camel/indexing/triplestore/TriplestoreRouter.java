@@ -5,26 +5,24 @@
  */
 package org.fcrepo.camel.indexing.triplestore;
 
+import static java.util.stream.Collectors.toList;
+import static org.apache.camel.support.builder.PredicateBuilder.in;
+import static org.apache.camel.support.builder.PredicateBuilder.not;
+import static org.apache.camel.support.builder.PredicateBuilder.or;
+import static org.fcrepo.camel.FcrepoHeaders.FCREPO_EVENT_TYPE;
+import static org.fcrepo.camel.FcrepoHeaders.FCREPO_NAMED_GRAPH;
+import static org.fcrepo.camel.FcrepoHeaders.FCREPO_URI;
+import static org.fcrepo.camel.processor.ProcessorUtils.tokenizePropertyPlaceholder;
+import static org.slf4j.LoggerFactory.getLogger;
+
 import org.apache.camel.LoggingLevel;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.language.xpath.XPathBuilder;
 import org.apache.camel.support.builder.Namespaces;
 import org.fcrepo.camel.common.processor.AddBasicAuthProcessor;
 import org.fcrepo.camel.processor.EventProcessor;
-import org.fcrepo.camel.processor.SparqlDeleteProcessor;
-import org.fcrepo.camel.processor.SparqlUpdateProcessor;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import static java.util.stream.Collectors.toList;
-import static org.apache.camel.builder.PredicateBuilder.in;
-import static org.apache.camel.builder.PredicateBuilder.not;
-import static org.apache.camel.builder.PredicateBuilder.or;
-import static org.fcrepo.camel.FcrepoHeaders.FCREPO_EVENT_TYPE;
-import static org.fcrepo.camel.FcrepoHeaders.FCREPO_NAMED_GRAPH;
-import static org.fcrepo.camel.FcrepoHeaders.FCREPO_URI;
-import static org.fcrepo.camel.processor.ProcessorUtils.tokenizePropertyPlaceholder;
-import static org.slf4j.LoggerFactory.getLogger;
 
 /**
  * A content router for handling Fedora events.
@@ -44,6 +42,7 @@ public class TriplestoreRouter extends RouteBuilder {
     /**
      * Configure the message route workflow.
      */
+    @Override
     public void configure() throws Exception {
 
         final Namespaces ns = new Namespaces("rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#");

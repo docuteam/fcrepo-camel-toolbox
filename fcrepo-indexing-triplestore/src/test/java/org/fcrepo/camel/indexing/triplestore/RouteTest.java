@@ -5,6 +5,21 @@
  */
 package org.fcrepo.camel.indexing.triplestore;
 
+import static java.net.URLEncoder.encode;
+import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
+import static org.apache.camel.util.ObjectHelper.loadResourceAsStream;
+import static org.fcrepo.camel.FcrepoHeaders.FCREPO_AGENT;
+import static org.fcrepo.camel.FcrepoHeaders.FCREPO_DATE_TIME;
+import static org.fcrepo.camel.FcrepoHeaders.FCREPO_EVENT_TYPE;
+import static org.fcrepo.camel.FcrepoHeaders.FCREPO_RESOURCE_TYPE;
+import static org.fcrepo.camel.FcrepoHeaders.FCREPO_URI;
+import static org.fcrepo.camel.indexing.triplestore.integration.TestUtils.ASSERT_PERIOD_MS;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.camel.CamelContext;
 import org.apache.camel.EndpointInject;
 import org.apache.camel.Exchange;
@@ -27,21 +42,6 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.support.AnnotationConfigContextLoader;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import static java.net.URLEncoder.encode;
-import static java.util.Arrays.asList;
-import static java.util.Collections.emptyList;
-import static org.apache.camel.util.ObjectHelper.loadResourceAsStream;
-import static org.fcrepo.camel.FcrepoHeaders.FCREPO_AGENT;
-import static org.fcrepo.camel.FcrepoHeaders.FCREPO_DATE_TIME;
-import static org.fcrepo.camel.FcrepoHeaders.FCREPO_EVENT_TYPE;
-import static org.fcrepo.camel.FcrepoHeaders.FCREPO_RESOURCE_TYPE;
-import static org.fcrepo.camel.FcrepoHeaders.FCREPO_URI;
-import static org.fcrepo.camel.indexing.triplestore.integration.TestUtils.ASSERT_PERIOD_MS;
 
 /**
  * Test the route workflow.
@@ -75,7 +75,6 @@ public class RouteTest {
     private static final String AS_NS = "https://www.w3.org/ns/activitystreams#";
     private static final String INDEXABLE = "http://fedora.info/definitions/v4/indexing#Indexable";
 
-
     @BeforeClass
     public static void beforeClass() {
         System.setProperty("triplestore.indexing.enabled", "true");
@@ -87,7 +86,7 @@ public class RouteTest {
     }
 
     private static Map<String, Object> createEvent(final String identifier, final List<String> eventTypes,
-                                                   final List<String> resourceTypes) {
+        final List<String> resourceTypes) {
         final Map<String, Object> headers = new HashMap<>();
         headers.put(FCREPO_URI, identifier);
         headers.put(FCREPO_DATE_TIME, eventDate);
@@ -116,7 +115,7 @@ public class RouteTest {
         indexEndpoint.setAssertPeriod(ASSERT_PERIOD_MS);
 
         template.sendBody(
-                IOUtils.toString(loadResourceAsStream("event_delete_resource.json"), "UTF-8"));
+            IOUtils.toString(loadResourceAsStream("event_delete_resource.json"), "UTF-8"));
 
         MockEndpoint.assertIsSatisfied(deleteEndpoint, indexEndpoint);
     }
@@ -135,7 +134,6 @@ public class RouteTest {
             a.mockEndpointsAndSkip("direct:index.triplestore");
         });
 
-
         final var deleteEndpoint = MockEndpoint.resolve(camelContext, "mock:direct:delete.triplestore");
         final var updateEndpoint = MockEndpoint.resolve(camelContext, "mock:direct:update.triplestore");
         deleteEndpoint.expectedMessageCount(0);
@@ -143,9 +141,9 @@ public class RouteTest {
         deleteEndpoint.setAssertPeriod(ASSERT_PERIOD_MS);
         updateEndpoint.setAssertPeriod(ASSERT_PERIOD_MS);
         template.sendBodyAndHeaders("",
-                createEvent(auditContainer + fileID, asList(AS_NS + "Update"), asList(REPOSITORY + "Binary")));
+            createEvent(auditContainer + fileID, asList(AS_NS + "Update"), asList(REPOSITORY + "Binary")));
         template.sendBodyAndHeaders("",
-                createEvent(auditContainer + fileID, asList(AS_NS + "Delete"), asList(REPOSITORY + "Binary")));
+            createEvent(auditContainer + fileID, asList(AS_NS + "Delete"), asList(REPOSITORY + "Binary")));
 
         MockEndpoint.assertIsSatisfied(deleteEndpoint, updateEndpoint);
     }
@@ -171,9 +169,9 @@ public class RouteTest {
         updateEndpoint.setAssertPeriod(ASSERT_PERIOD_MS);
 
         template.sendBodyAndHeaders("",
-                createEvent(auditContainer, asList(AS_NS + "Update"), asList(REPOSITORY + "Binary")));
+            createEvent(auditContainer, asList(AS_NS + "Update"), asList(REPOSITORY + "Binary")));
         template.sendBodyAndHeaders("",
-                createEvent(auditContainer, asList(AS_NS + "Delete"), asList(REPOSITORY + "Binary")));
+            createEvent(auditContainer, asList(AS_NS + "Delete"), asList(REPOSITORY + "Binary")));
 
         MockEndpoint.assertIsSatisfied(deleteEndpoint, updateEndpoint);
     }
@@ -197,9 +195,9 @@ public class RouteTest {
         updateEndpoint.setAssertPeriod(ASSERT_PERIOD_MS);
 
         template.sendBodyAndHeaders(
-                IOUtils.toString(loadResourceAsStream("container.rdf"), "UTF-8"),
-                createEvent(auditContainer + "orium" + fileID,
-                        asList(AS_NS + "Create"), asList(REPOSITORY + "Resource")));
+            IOUtils.toString(loadResourceAsStream("container.rdf"), "UTF-8"),
+            createEvent(auditContainer + "orium" + fileID,
+                asList(AS_NS + "Create"), asList(REPOSITORY + "Resource")));
 
         MockEndpoint.assertIsSatisfied(deleteEndpoint, updateEndpoint);
     }
@@ -223,9 +221,9 @@ public class RouteTest {
         updateEndpoint.expectedMessageCount(1);
 
         template.sendBodyAndHeaders(
-                IOUtils.toString(loadResourceAsStream("indexable.rdf"), "UTF-8"),
-                createEvent(auditContainer + "orium" + fileID,
-                        asList(AS_NS + "Create"), asList(REPOSITORY + "Container")));
+            IOUtils.toString(loadResourceAsStream("indexable.rdf"), "UTF-8"),
+            createEvent(auditContainer + "orium" + fileID,
+                asList(AS_NS + "Create"), asList(REPOSITORY + "Container")));
 
         MockEndpoint.assertIsSatisfied(deleteEndpoint, updateEndpoint);
     }
@@ -249,8 +247,8 @@ public class RouteTest {
         deleteEndpoint.setAssertPeriod(ASSERT_PERIOD_MS);
 
         template.sendBodyAndHeaders(
-                IOUtils.toString(loadResourceAsStream("event.json"), "UTF-8"),
-                createEvent(fileID, asList(AS_NS + "Create"), asList(INDEXABLE)));
+            IOUtils.toString(loadResourceAsStream("event.json"), "UTF-8"),
+            createEvent(fileID, asList(AS_NS + "Create"), asList(INDEXABLE)));
 
         MockEndpoint.assertIsSatisfied(deleteEndpoint, indexEndpoint);
     }
@@ -267,7 +265,6 @@ public class RouteTest {
             a.mockEndpointsAndSkip("direct:delete.triplestore");
         });
 
-
         final var updateEndpoint = MockEndpoint.resolve(camelContext, "mock:direct:update.triplestore");
         final var deleteEndpoint = MockEndpoint.resolve(camelContext, "mock:direct:delete.triplestore");
         updateEndpoint.expectedMessageCount(0);
@@ -275,8 +272,8 @@ public class RouteTest {
         deleteEndpoint.expectedMessageCount(1);
 
         template.sendBodyAndHeaders(
-                IOUtils.toString(loadResourceAsStream("container.rdf"), "UTF-8"),
-                createEvent(fileID, asList(AS_NS + "Create"), asList(REPOSITORY + "Container")));
+            IOUtils.toString(loadResourceAsStream("container.rdf"), "UTF-8"),
+            createEvent(fileID, asList(AS_NS + "Create"), asList(REPOSITORY + "Container")));
 
         MockEndpoint.assertIsSatisfied(deleteEndpoint, updateEndpoint);
     }
@@ -300,8 +297,8 @@ public class RouteTest {
         deleteEndpoint.setAssertPeriod(ASSERT_PERIOD_MS);
 
         template.sendBodyAndHeaders(
-                IOUtils.toString(loadResourceAsStream("indexable.rdf"), "UTF-8"),
-                createEvent(fileID, asList(AS_NS + "Create"), asList(INDEXABLE)));
+            IOUtils.toString(loadResourceAsStream("indexable.rdf"), "UTF-8"),
+            createEvent(fileID, asList(AS_NS + "Create"), asList(INDEXABLE)));
 
         MockEndpoint.assertIsSatisfied(deleteEndpoint, updateEndpoint);
 
@@ -313,8 +310,36 @@ public class RouteTest {
 
         final String document = IOUtils.toString(loadResourceAsStream("container.nt"), "UTF-8").trim();
         final String responsePrefix =
-                "DELETE WHERE { <" + baseURL + fileID + "> ?p ?o };\n" +
-                        "INSERT DATA { ";
+            "PREFIX rico: <https://www.ica.org/standards/RiC/ontology#>\nPREFIX premis: <http://www.loc.gov/premis/rdf/v3/>\n" +
+                "PREFIX schema: <http://schema.org/>\n" +
+                "DELETE { ?s ?p ?o }" +
+                " WHERE { ?s rico:isOrWasIdentifierOf/rico:thingIsTargetOfRuleRelation/" +
+                "rico:ruleRelationHasSource/rico:regulatesOrRegulated <" +
+                baseURL + fileID +
+                "> . ?s ?p ?o . };\nDELETE { ?s ?p ?o } WHERE { ?s (rico:thingIsTargetOfEventRelation|" +
+                "rico:thingIsTargetOfRuleRelation)/(rico:ruleRelationHasSource|" +
+                "rico:eventRelationHasSource)/(rico:regulatesOrRegulated|" + "rico:isEventAssociatedWith) <" +
+                baseURL + fileID +
+                "> . ?s ?p ?o . };\nDELETE { ?s ?p ?o } WHERE { ?s (rico:isOrWasIdentifierOf|" +
+                "rico:ruleRelationHasSource|rico:appellationIsSourceOfAppellationRelation|" +
+                "rico:placeIsSourceOfPlaceRelation|rico:agentIsTargetOfAgentOriginationRelation|" +
+                "rico:isDateAssociatedWith|rico:isBeginningDateOf|rico:isEndDateOf|rico:isOrWasAppellationOf|" +
+                "rico:regulatesOrRegulated|rico:isOrWasSubeventOf|rico:eventRelationHasSource|" +
+                "rico:ruleIsSourceOfRuleRelation|rico:eventIsSourceOfEventRelation)/" +
+                "(rico:regulatesOrRegulated|rico:appellationRelationHasTarget|rico:placeRelationHasTarget|" +
+                "rico:agentOriginationRelationHasSource|rico:isEventAssociatedWith|rico:ruleRelationHasTarget|" +
+                "rico:eventRelationHasTarget) <" +
+                baseURL + fileID +
+                "> . ?s ?p ?o . };\nDELETE { ?s ?p ?o } WHERE { ?s (rico:isOrWasTitleOf|rico:isOrWasIdentifierOf|" +
+                "rico:regulatesOrRegulated|rico:isDocumentaryFormTypeOf|rico:isOrWasAppellationOf|" +
+                "rico:isExtentOf|rico:isCarrierTypeOf|rico:isContentTypeOf|rico:isBeginningDateOf|" +
+                "rico:isEndDateOf|rico:isDateAssociatedWith|rico:isLastUpdateDateOf|rico:isRuleAssociatedWith|" +
+                "rico:isOrWasLanguageOf|rico:appellationRelationHasTarget|rico:placeRelationHasTarget|" +
+                "rico:agentOriginationRelationHasSource|rico:isEventAssociatedWith|rico:ruleRelationHasTarget|" +
+                "rico:eventRelationHasTarget|schema:position) <" +
+                baseURL + fileID + "> . ?s ?p ?o . };\nDELETE { ?s ?p ?o } WHERE { <" + baseURL + fileID +
+                "> premis:fixity ?s . ?s ?p ?o . };\nDELETE WHERE { <" + baseURL + fileID + "> ?p ?o };\n" +
+                "INSERT DATA { ";
 
         final var context = camelContext.adapt(ModelCamelContext.class);
 
@@ -335,12 +360,12 @@ public class RouteTest {
         }
 
         final Map<String, Object> headers = createEvent(baseURL + fileID, asList(AS_NS + "Create"),
-                asList(REPOSITORY + "Container"));
+            asList(REPOSITORY + "Container"));
         headers.put(Exchange.CONTENT_TYPE, "application/rdf+xml");
 
         template.sendBodyAndHeaders("direct:update.triplestore",
-                IOUtils.toString(loadResourceAsStream("container.rdf"), "UTF-8"),
-                headers);
+            IOUtils.toString(loadResourceAsStream("container.rdf"), "UTF-8"),
+            headers);
 
         endpoint.assertIsSatisfied();
     }
@@ -368,7 +393,7 @@ public class RouteTest {
         endpoint.expectedHeaderReceived(Exchange.HTTP_METHOD, "POST");
 
         template.sendBodyAndHeaders("direct:delete.triplestore", "",
-                createEvent(fileID, asList(AS_NS + "Delete")));
+            createEvent(fileID, asList(AS_NS + "Delete")));
 
         endpoint.assertIsSatisfied();
     }
