@@ -86,7 +86,7 @@ public class RouteTest {
     }
 
     private static Map<String, Object> createEvent(final String identifier, final List<String> eventTypes,
-        final List<String> resourceTypes) {
+                                                   final List<String> resourceTypes) {
         final Map<String, Object> headers = new HashMap<>();
         headers.put(FCREPO_URI, identifier);
         headers.put(FCREPO_DATE_TIME, eventDate);
