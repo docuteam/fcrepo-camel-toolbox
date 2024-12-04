@@ -4,7 +4,7 @@
  * tree.
  */
 
-package org.fcrepo.camel.indexing.triplestore;
+package ch.docuteam.camel.indexing.triplestore;
 
 import static java.util.Arrays.stream;
 import static java.util.Collections.emptyList;

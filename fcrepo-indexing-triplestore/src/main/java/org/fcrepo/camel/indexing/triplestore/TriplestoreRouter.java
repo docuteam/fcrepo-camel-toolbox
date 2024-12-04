@@ -15,6 +15,8 @@ import static org.fcrepo.camel.FcrepoHeaders.FCREPO_URI;
 import static org.fcrepo.camel.processor.ProcessorUtils.tokenizePropertyPlaceholder;
 import static org.slf4j.LoggerFactory.getLogger;
 
+import ch.docuteam.camel.indexing.triplestore.SparqlDeleteProcessor;
+import ch.docuteam.camel.indexing.triplestore.SparqlUpdateProcessor;
 import org.apache.camel.LoggingLevel;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.language.xpath.XPathBuilder;
@@ -42,7 +44,6 @@ public class TriplestoreRouter extends RouteBuilder {
     /**
      * Configure the message route workflow.
      */
-    @Override
     public void configure() throws Exception {
 
         final Namespaces ns = new Namespaces("rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#");

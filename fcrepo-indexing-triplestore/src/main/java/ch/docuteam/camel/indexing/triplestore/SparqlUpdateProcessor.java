@@ -3,7 +3,7 @@
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree.
  */
-package org.fcrepo.camel.indexing.triplestore;
+package ch.docuteam.camel.indexing.triplestore;
 
 import static java.net.URLEncoder.encode;
 import static org.apache.camel.Exchange.CONTENT_TYPE;
