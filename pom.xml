@@ -9,10 +9,10 @@
     <version>6.1.0</version>
   </parent>
 
-  <groupId>org.fcrepo.camel</groupId>
+  <groupId>ch.docuteam</groupId>
   <artifactId>fcrepo-camel-toolbox</artifactId>
   <packaging>pom</packaging>
-  <version>6.2.0-docuteam-SNAPSHOT</version>
+  <version>${fcrepo-camel-toolbox.version}</version>
 
   <name>Fedora Camel Workflows</name>
   <description>A collection of camel-based event-driven workflows</description>
@@ -29,6 +29,8 @@
     <project_name>fcrepo-camel-toolbox</project_name>
     <project_organization>fcrepo-exts</project_organization>
     <project.copyrightYear>2016</project.copyrightYear>
+
+    <fcrepo-camel-toolbox.version>1.0.0</fcrepo-camel-toolbox.version>
 
     <!-- dependencies -->
     <activemq.version>5.16.7</activemq.version>
